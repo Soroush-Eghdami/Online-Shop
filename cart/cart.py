@@ -3,7 +3,7 @@ from django.conf import settings
 from shop.models import Product
 
 class Cart:
-    def init(self, request):
+    def __init__(self, request):
         self.session = request.session
         cart = self.session.get(settings.CART_SESSION_ID)
         if not cart:
@@ -29,7 +29,7 @@ class Cart:
             del self.cart[product_id]
             self.save()
 
-    def iter(self):
+    def __iter__(self):
         product_ids = self.cart.keys()
         products = Product.objects.filter(id__in=product_ids)
         for product in products:
@@ -38,7 +38,7 @@ class Cart:
             item['total_price'] = Decimal(item['price']) * item['quantity']
             yield item
 
-    def len(self):
+    def __len__(self):
         return sum(item['quantity'] for item in self.cart.values())
 
     def get_total_price(self):

@@ -19,6 +19,12 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('shop/', include('shop.urls'), name='shop'),
-    path('cart/', include('cart.urls', namespace='cart')),
+
+    # explicit top-level apps MUST come before the shop include
+    path('cart/', include(('cart.urls', 'cart'), namespace='cart')),
+    # path('accounts/', include(('accounts.urls', 'accounts'), namespace='accounts')),
+    # add other top-level routes here (orders, dashboard, etc.)
+
+    # finally include shop at root — product_list will handle `/`
+    path('', include(('shop.urls', 'shop'), namespace='shop')),
 ]
