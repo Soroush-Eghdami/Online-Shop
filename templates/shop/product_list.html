@@ -3,19 +3,19 @@
 {% block title %}Shop{% endblock %}
 
 {% block content %}
-  <h1>Products</h1>
+  <h1 class="page-title">Products</h1>
   {% if products %}
-      <ul>
+      <div class="product-grid">
         {% for product in products %}
-          <li>
+          <div class="product-card">
             <a href="{% url 'shop:product_detail' product.slug %}">
               <h3>{{ product.name }}</h3>
             </a>
-            <p>{{ product.price }} $</p>
+            <p class="price">{{ product.price }} $</p>
             <p>{{ product.description|truncatechars:50 }}</p>
-          </li>
+          </div>
         {% endfor %}
-      </ul>
+      </div>
   {% else %}
       <p>No products available.</p>
   {% endif %}
