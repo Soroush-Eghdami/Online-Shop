@@ -3,21 +3,55 @@
 {% block title %}Your Cart{% endblock %}
 
 {% block content %}
-  <h1 class="page-title">Your Shopping Cart</h1>
+  <h1 class="page-title">🛒 Your Shopping Cart</h1>
 
   {% if cart %}
-    <ul>
-      {% for item in cart %}
-        <li>
-          {{ item.product.name }} - {{ item.quantity }} × {{ item.product.price }} = {{ item.total_price }}
-          <a href="{% url 'cart:cart_remove' item.product.id %}" class="btn">❌ Remove</a>
-        </li>
-      {% endfor %}
-    </ul>
-    <p><strong>Total: {{ cart.get_total_price }}</strong></p>
+    <table class="cart-table">
+      <thead>
+        <tr>
+          <th>Image</th>
+          <th>Product</th>
+          <th>Price</th>
+          <th>Quantity</th>
+          <th>Total</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in cart %}
+          <tr>
+<td class="cart-image-cell">
+  {% if item.product.image %}
+    <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" style="width: 70px; height: 70px; object-fit: cover;">
+  {% else %}
+    <img src="https://via.placeholder.com/70x70?text=No+Image" alt="No image" style="width: 70px; height: 70px;">
+  {% endif %}
+</td>
+            <td class="cart-name-cell">{{ item.product.name }}</td>
+            <td>${{ item.product.price }}</td>
+            <td>
+              <form action="{% url 'cart:cart_add' item.product.id %}" method="post" class="cart-form">
+                {% csrf_token %}
+                {{ item.update_quantity_form.quantity }}
+                {{ item.update_quantity_form.override }}
+                <button type="submit" class="btn update-btn">Update</button>
+              </form>
+            </td>
+            <td>${{ item.total_price }}</td>
+            <td>
+              <a href="{% url 'cart:cart_remove' item.product.id %}" class="btn remove-btn">❌</a>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <div class="cart-summary">
+      <p><strong>Total: ${{ cart.get_total_price }}</strong></p>
+      <a href="{% url 'shop:product_list' %}" class="btn continue-btn">⬅️ Continue Shopping</a>
+    </div>
   {% else %}
     <p>Your cart is empty.</p>
+    <a href="{% url 'shop:product_list' %}" class="btn continue-btn">⬅️ Back to Shop</a>
   {% endif %}
-
-  <a href="{% url 'shop:product_list' %}" class="btn">⬅️ Continue Shopping</a>
 {% endblock %}

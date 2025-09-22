@@ -21,10 +21,13 @@
         <p class="description"><em>No description available</em></p>
       {% endif %}
 
-      <form action="{% url 'cart:cart_add' product.id %}" method="post">
-        {% csrf_token %}
-        <button type="submit" class="btn">Add to Cart</button>
-      </form>
+<form action="{% url 'cart:cart_add' product.id %}" method="post">
+  {% csrf_token %}
+  {{ cart_product_form.quantity }}
+  {{ cart_product_form.override }}
+  <button type="submit" class="btn">Add to Cart</button>
+</form>
+
     </div>
   </div>
 </div>
