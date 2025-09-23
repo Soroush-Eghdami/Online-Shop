@@ -1,32 +1,44 @@
 {% extends "base.html" %}
 
-{% block title %}Shop{% endblock %}
+{% block title %}Products{% endblock %}
 
 {% block content %}
-  <h1 class="page-title">Products</h1>
+  <h1 class="page-title">🛍️ Our Products</h1>
 
-  {% if products %}
-    <div class="product-grid">
-      {% for product in products %}
-        <div class="product-card">
-          <a href="{% url 'shop:product_detail' product.slug %}">
-            {% if product.image %}
-              <img src="{{ product.image.url }}" alt="{{ product.name }}">
-            {% else %}
-              <img src="https://via.placeholder.com/220x180?text=No+Image" alt="No image">
-            {% endif %}
-            <h3>{{ product.name }}</h3>
-          </a>
-          <p class="price">${{ product.price }}</p>
-          <p>{{ product.description|truncatechars:50 }}</p>
-          <form action="{% url 'cart:cart_add' product.id %}" method="post">
-            {% csrf_token %}
-            <button type="submit" class="btn">Add to Cart</button>
-          </form>
-        </div>
-      {% endfor %}
+  <!-- Search form -->
+  <form method="get" action="{% url 'shop:product_list' %}" class="search-form">
+    <input type="text" name="q" placeholder="Search products..." value="{{ request.GET.q }}">
+    <button type="submit" class="btn search-btn">Search</button>
+  </form>
+
+<div class="product-grid">
+  {% for product in products %}
+    <div class="product-card">
+      <a href="{% url 'shop:product_detail' product.id product.slug %}">
+        {% if product.image %}
+          <img src="{{ product.image.url }}" alt="{{ product.name }}">
+        {% else %}
+          <img src="https://via.placeholder.com/220x180?text=No+Image" alt="No image">
+        {% endif %}
+      </a>
+
+      <h3>
+        <a href="{% url 'shop:product_detail' product.id product.slug %}">
+          {{ product.name }}
+        </a>
+      </h3>
+
+      <p class="price">${{ product.price }}</p>
+
+      <!-- Add to Cart Form -->
+      <form action="{% url 'cart:cart_add' product.id %}" method="post">
+        {% csrf_token %}
+        <input type="hidden" name="quantity" value="1">
+        <input type="hidden" name="override" value="False">
+        <button type="submit" class="btn">🛒 Add to Cart</button>
+      </form>
     </div>
-  {% else %}
-    <p>No products available.</p>
-  {% endif %}
+  {% endfor %}
+</div>
+
 {% endblock %}

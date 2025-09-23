@@ -7,13 +7,15 @@
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
 <body>
-    <header>
-        <nav>
-            <a href="{% url 'shop:product_list' %}">Home</a>
-            <a href="{% url 'cart:cart_detail' %}">Cart</a>
-            <a href="#">Login</a>
-        </nav>
-    </header>
+<header>
+    <nav>
+        <a href="{% url 'shop:product_list' %}">Home</a>
+        <a href="{% url 'cart:cart_detail' %}">
+          Cart ({{ cart|length }})
+        </a>
+        <a href="#">Login</a>
+    </nav>
+</header>
 
     <main>
         {% block content %}{% endblock %}
@@ -22,5 +24,16 @@
     <footer>
         <p>&copy; 2025 Ecom Shop</p>
     </footer>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const inputs = document.querySelectorAll(".auto-update-form input[type='number']");
+    inputs.forEach(input => {
+      input.addEventListener("change", function () {
+        this.form.submit();  // auto submit when quantity changes
+      });
+    });
+  });
+</script>
 </body>
 </html>
