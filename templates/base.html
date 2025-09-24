@@ -17,23 +17,26 @@
     </nav>
 </header>
 
-    <main>
-        {% block content %}{% endblock %}
-    </main>
+<main>
+    {% block content %}{% endblock %}
+</main>
 
-    <footer>
-        <p>&copy; 2025 Ecom Shop</p>
-    </footer>
+<footer>
+    <p>&copy; 2025 Ecom Shop</p>
+</footer>
 
 <script>
-  document.addEventListener("DOMContentLoaded", function () {
-    const inputs = document.querySelectorAll(".auto-update-form input[type='number']");
-    inputs.forEach(input => {
+document.addEventListener("DOMContentLoaded", function () {
+  const forms = document.querySelectorAll(".auto-update-form");
+  forms.forEach(form => {
+    const input = form.querySelector("input[type='number']");
+    if (input) {
       input.addEventListener("change", function () {
-        this.form.submit();  // auto submit when quantity changes
+        form.submit();  // auto-submit when quantity changes
       });
-    });
+    }
   });
+});
 </script>
 </body>
 </html>
