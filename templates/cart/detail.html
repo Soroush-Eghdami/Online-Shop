@@ -1,110 +1,56 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
 
-{% block title %}Your Cart{% endblock %}
+{% block title %}Your Shopping Cart{% endblock %}
 
 {% block content %}
-  <h1 class="page-title">🛒 Your Shopping Cart</h1>
-
-  {% if cart %}
-    <table class="cart-table">
-      <thead>
-        <tr>
-          <th>Image</th>
-          <th>Product</th>
-          <th>Price</th>
-          <th>Quantity</th>
-          <th>Total</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for item in cart %}
-          <tr data-product-id="{{ item.product.id }}">
-            <td class="cart-image-cell">
-              {% if item.product.image %}
-                <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}">
-              {% else %}
-                <img src="https://via.placeholder.com/70x70?text=No+Image" alt="No image">
-              {% endif %}
-            </td>
-            <td class="cart-name-cell">{{ item.product.name }}</td>
-            <td class="item-price">${{ item.product.price }}</td>
-            <td>
-              <form action="{% url 'cart:cart_add' item.product.id %}" method="post" class="cart-form auto-update-form">
-                {% csrf_token %}
-                {{ item.update_quantity_form.quantity }}
-                <input type="hidden" name="override" value="True">
-              </form>
-            </td>
-            <td class="item-total" data-original-total="{{ item.total_price }}">${{ item.total_price }}</td>
-            <td>
-              <a href="{% url 'cart:cart_remove' item.product.id %}" class="btn remove-btn">❌</a>
-            </td>
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-
-    <div class="cart-summary">
-      <p><strong>Total: <span id="cart-total">${{ cart.get_total_price }}</span></strong></p>
-      <a href="{% url 'shop:product_list' %}" class="btn continue-btn">⬅️ Continue Shopping</a>
-    </div>
-  {% else %}
-    <p>Your cart is empty.</p>
-    <div class="cart-summary">
-      <p><strong>Total: $0.00</strong></p>
-    </div>
-    <a href="{% url 'shop:product_list' %}" class="btn continue-btn">⬅️ Back to Shop</a>
-  {% endif %}
-
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      // Store the cart detail URL in a variable to avoid syntax issues
-      const cartDetailUrl = "{% url 'cart:cart_detail' %}";
-
-      document.querySelectorAll(".auto-update-form input[type='number']").forEach(input => {
-        input.addEventListener("change", async (event) => {
-          const form = event.target.form;
-          const productId = form.closest('tr').dataset.productId;
-          const quantity = parseInt(event.target.value);
-          const price = parseFloat(form.closest('tr').querySelector('.item-price').textContent.replace('$', ''));
-
-          // Update item total in the row
-          const itemTotalElement = form.closest('tr').querySelector('.item-total');
-          const newItemTotal = (quantity * price).toFixed(2);
-          itemTotalElement.textContent = `$${newItemTotal}`;
-
-          // Send AJAX request to update cart
-          const formData = new FormData(form);
-          try {
-            const response = await fetch(form.action, {
-              method: 'POST',
-              body: formData,
-              headers: {
-                'X-Requested-With': 'XMLHttpRequest'
-              }
-            });
-            if (response.ok) {
-              // Update cart total
-              const data = await response.json();
-              document.getElementById('cart-total').textContent = `$${data.cart_total.toFixed(2)}`;
-              // Update cart count in header
-              const cartLink = document.querySelector(`a[href="${cartDetailUrl}"]`);
-              if (cartLink) {
-                cartLink.textContent = `Cart (${data.cart_count})`;
-              }
-            } else {
-              console.error('Failed to update cart');
-              // Revert item total if server update fails
-              itemTotalElement.textContent = `$${itemTotalElement.dataset.originalTotal}`;
-            }
-          } catch (error) {
-            console.error('Error:', error);
-            // Revert item total on error
-            itemTotalElement.textContent = `$${itemTotalElement.dataset.originalTotal}`;
-          }
-        });
-      });
-    });
-  </script>
+<div class="cart-container">
+    <h1>Your Shopping Cart</h1>
+    {% if cart %}
+        <table>
+            <thead>
+                <tr style="background-color: blue; color: white;">
+                    <th>IMAGE</th>
+                    <th>PRODUCT</th>
+                    <th>PRICE</th>
+                    <th>QUANTITY</th>
+                    <th>TOTAL</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in cart %}
+                <tr>
+                    <td>
+                        {% if item.product.image %}
+                            <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" style="width: 50px; height: 50px;">
+                        {% else %}
+                            No image
+                        {% endif %}
+                    </td>
+                    <td>{{ item.product.name }}</td>
+                    <td>${{ item.product.price|floatformat:2 }}</td>
+                    <td>
+                        <form method="post" action="{% url 'cart:cart_update' item.product.id %}">
+                            {% csrf_token %}
+                            {{ item.update_quantity_form.quantity }}
+                            {{ item.update_quantity_form.update }}
+                            <button type="submit" style="margin-left: 5px;">Update</button>
+                        </form>
+                    </td>
+                    <td>${{ item.total_price|floatformat:2 }}</td>
+                    <td>
+                        <a href="{% url 'cart:cart_remove' item.product.id %}" style="color: red;">❌</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <p><strong>Total: ${{ cart.get_total_price|floatformat:2 }}</strong></p>
+        <a href="{% url 'shop:product_list' %}" class="btn btn-primary">Continue Shopping</a>
+    {% else %}
+        <p>Your cart is empty.</p>
+        <p>Total: $0.00</p>
+        <a href="{% url 'shop:product_list' %}" class="btn btn-primary">Back to Shop</a>
+    {% endif %}
+</div>
 {% endblock %}
