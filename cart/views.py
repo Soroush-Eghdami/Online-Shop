@@ -23,10 +23,13 @@ def cart_update(request, product_id):
     form = CartAddProductForm(request.POST)
     if form.is_valid():
         cd = form.cleaned_data
-        cart.add(product=product,
-                 quantity=cd['quantity'],
-                 update_quantity=cd['update'])
+        cart.add(
+            product=product,
+            quantity=cd['quantity'],
+            override_quantity=True   # 🔥 always replace, not add
+        )
     return redirect('cart:cart_detail')
+
 
 def cart_remove(request, product_id):
     cart = Cart(request)

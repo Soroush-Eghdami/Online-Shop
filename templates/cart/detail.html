@@ -1,56 +1,59 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 
-{% block title %}Your Shopping Cart{% endblock %}
+{% block title %}Your Cart{% endblock %}
 
 {% block content %}
-<div class="cart-container">
-    <h1>Your Shopping Cart</h1>
-    {% if cart %}
-        <table>
-            <thead>
-                <tr style="background-color: blue; color: white;">
-                    <th>IMAGE</th>
-                    <th>PRODUCT</th>
-                    <th>PRICE</th>
-                    <th>QUANTITY</th>
-                    <th>TOTAL</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for item in cart %}
-                <tr>
-                    <td>
-                        {% if item.product.image %}
-                            <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" style="width: 50px; height: 50px;">
-                        {% else %}
-                            No image
-                        {% endif %}
-                    </td>
-                    <td>{{ item.product.name }}</td>
-                    <td>${{ item.product.price|floatformat:2 }}</td>
-                    <td>
-                        <form method="post" action="{% url 'cart:cart_update' item.product.id %}">
-                            {% csrf_token %}
-                            {{ item.update_quantity_form.quantity }}
-                            {{ item.update_quantity_form.update }}
-                            <button type="submit" style="margin-left: 5px;">Update</button>
-                        </form>
-                    </td>
-                    <td>${{ item.total_price|floatformat:2 }}</td>
-                    <td>
-                        <a href="{% url 'cart:cart_remove' item.product.id %}" style="color: red;">❌</a>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        <p><strong>Total: ${{ cart.get_total_price|floatformat:2 }}</strong></p>
-        <a href="{% url 'shop:product_list' %}" class="btn btn-primary">Continue Shopping</a>
-    {% else %}
-        <p>Your cart is empty.</p>
-        <p>Total: $0.00</p>
-        <a href="{% url 'shop:product_list' %}" class="btn btn-primary">Back to Shop</a>
-    {% endif %}
-</div>
+  <h1 class="page-title">🛒 Your Shopping Cart</h1>
+
+  {% if cart %}
+    <table class="cart-table">
+      <thead>
+        <tr>
+          <th>Image</th>
+          <th>Product</th>
+          <th>Price</th>
+          <th>Quantity</th>
+          <th>Total</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in cart %}
+          <tr>
+            <td class="cart-image-cell">
+              {% if item.product.image %}
+                <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}">
+              {% else %}
+                <img src="https://via.placeholder.com/70x70?text=No+Image" alt="No image">
+              {% endif %}
+            </td>
+            <td class="cart-name-cell">{{ item.product.name }}</td>
+            <td>${{ item.product.price|floatformat:2 }}</td>
+            <td>
+              <form action="{% url 'cart:cart_update' item.product.id %}" method="post" class="cart-form auto-update-form">
+                {% csrf_token %}
+                {{ item.update_quantity_form.quantity }}
+                {{ item.update_quantity_form.override }}
+              </form>
+            </td>
+            <td>${{ item.total_price|floatformat:2 }}</td>
+            <td>
+              <a href="{% url 'cart:cart_remove' item.product.id %}" class="btn remove-btn">❌</a>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <div class="cart-summary">
+      <p><strong>Total: ${{ cart.get_total_price|floatformat:2 }}</strong></p>
+      <a href="{% url 'shop:product_list' %}" class="btn continue-btn">⬅️ Continue Shopping</a>
+    </div>
+  {% else %}
+    <p>Your cart is empty.</p>
+    <div class="cart-summary">
+      <p><strong>Total: $0.00</strong></p>
+    </div>
+    <a href="{% url 'shop:product_list' %}" class="btn continue-btn">⬅️ Back to Shop</a>
+  {% endif %}
 {% endblock %}

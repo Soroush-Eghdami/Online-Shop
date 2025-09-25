@@ -26,17 +26,17 @@
 </footer>
 
 <script>
-document.addEventListener("DOMContentLoaded", function () {
-  const forms = document.querySelectorAll(".auto-update-form");
-  forms.forEach(form => {
-    const input = form.querySelector("input[type='number']");
-    if (input) {
-      input.addEventListener("change", function () {
-        form.submit();  // auto-submit when quantity changes
-      });
-    }
+  document.addEventListener("DOMContentLoaded", function () {
+    const forms = document.querySelectorAll(".auto-update-form");
+    forms.forEach(form => {
+      const input = form.querySelector("input[type='number']");
+      if (input) {
+        input.addEventListener("change", function () {
+          form.submit();  // auto-submit on change
+        });
+      }
+    });
   });
-});
 </script>
 </body>
 </html>
