@@ -1,10 +1,24 @@
 from django.shortcuts import render, get_object_or_404
+from django.db.models import Q
 from .models import Product
 from cart.forms import CartAddProductForm
 
 def product_list(request):
     products = Product.objects.all()
-    return render(request, 'shop/product_list.html', {'products': products})
+    query = request.GET.get('q')
+    
+    if query:
+        # Search in product name, description, and slug
+        products = products.filter(
+            Q(name__icontains=query) |
+            Q(description__icontains=query) |
+            Q(slug__icontains=query)
+        ).distinct()
+    
+    return render(request, 'shop/product_list.html', {
+        'products': products,
+        'query': query
+    })
 
 def product_detail(request, id, slug):
     product = get_object_or_404(Product, id=id, slug=slug)

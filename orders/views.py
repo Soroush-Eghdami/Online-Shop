@@ -13,28 +13,32 @@ def order_create(request):
     if request.method == 'POST':
         form = OrderCreateForm(request.POST)
         if form.is_valid():
-            order = form.save(commit=False)
+            # Create the order manually since OrderCreateForm is not a ModelForm
+            order_data = form.cleaned_data
+            
             if request.user.is_authenticated:
-                order.user = request.user
-                # Pre-fill user information if available
-                order.first_name = request.user.first_name or form.cleaned_data['first_name']
-                order.last_name = request.user.last_name or form.cleaned_data['last_name']
-                order.email = request.user.email or form.cleaned_data['email']
-                if hasattr(request.user, 'profile'):
-                    profile = request.user.profile
-                    order.address = profile.address or form.cleaned_data['address']
-                    order.city = profile.city or form.cleaned_data['city']
-                    order.postal_code = profile.postal_code or form.cleaned_data['postal_code']
+                # Use user data if available, otherwise use form data
+                order = Order.objects.create(
+                    user=request.user,
+                    first_name=request.user.first_name or order_data['first_name'],
+                    last_name=request.user.last_name or order_data['last_name'],
+                    email=request.user.email or order_data['email'],
+                    address=request.user.profile.address if hasattr(request.user, 'profile') and request.user.profile.address else order_data['address'],
+                    city=request.user.profile.city if hasattr(request.user, 'profile') and request.user.profile.city else order_data['city'],
+                    postal_code=request.user.profile.postal_code if hasattr(request.user, 'profile') and request.user.profile.postal_code else order_data['postal_code'],
+                )
             else:
-                order.first_name = form.cleaned_data['first_name']
-                order.last_name = form.cleaned_data['last_name']
-                order.email = form.cleaned_data['email']
-                order.address = form.cleaned_data['address']
-                order.city = form.cleaned_data['city']
-                order.postal_code = form.cleaned_data['postal_code']
+                # Create order for anonymous user
+                order = Order.objects.create(
+                    first_name=order_data['first_name'],
+                    last_name=order_data['last_name'],
+                    email=order_data['email'],
+                    address=order_data['address'],
+                    city=order_data['city'],
+                    postal_code=order_data['postal_code'],
+                )
             
-            order.save()
-            
+            # Create order items
             for item in cart:
                 OrderItem.objects.create(
                     order=order,
@@ -72,3 +76,4 @@ def order_list(request):
 def order_detail(request, order_id):
     order = get_object_or_404(Order, id=order_id, user=request.user)
     return render(request, 'orders/order/detail.html', {'order': order})
+
