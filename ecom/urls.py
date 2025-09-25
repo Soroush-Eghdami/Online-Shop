@@ -24,8 +24,9 @@ urlpatterns = [
 
     # explicit top-level apps MUST come before the shop include
     path('cart/', include(('cart.urls', 'cart'), namespace='cart')),
-    # path('accounts/', include(('accounts.urls', 'accounts'), namespace='accounts')),
-    # add other top-level routes here (orders, dashboard, etc.)
+    path('accounts/', include(('accounts.urls', 'accounts'), namespace='accounts')),
+    path('orders/', include(('orders.urls', 'orders'), namespace='orders')),
+    # add other top-level routes here (dashboard, etc.)
 
     # finally include shop at root — product_list will handle `/`
     path('', include(('shop.urls', 'shop'), namespace='shop')),

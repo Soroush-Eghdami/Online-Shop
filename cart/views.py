@@ -26,7 +26,7 @@ def cart_update(request, product_id):
         cart.add(
             product=product,
             quantity=cd['quantity'],
-            override_quantity=True   # 🔥 always replace, not add
+            update_quantity=True   # Always replace, not add
         )
     return redirect('cart:cart_detail')
 

@@ -13,7 +13,14 @@
         <a href="{% url 'cart:cart_detail' %}">
           Cart ({{ cart|length }})
         </a>
-        <a href="#">Login</a>
+        {% if user.is_authenticated %}
+            <a href="{% url 'accounts:profile' %}">Profile</a>
+            <a href="{% url 'orders:order_list' %}">My Orders</a>
+            <a href="{% url 'accounts:logout' %}">Logout</a>
+        {% else %}
+            <a href="{% url 'accounts:login' %}">Login</a>
+            <a href="{% url 'accounts:register' %}">Register</a>
+        {% endif %}
     </nav>
 </header>
 
@@ -25,18 +32,6 @@
     <p>&copy; 2025 Ecom Shop</p>
 </footer>
 
-<script>
-  document.addEventListener("DOMContentLoaded", function () {
-    const forms = document.querySelectorAll(".auto-update-form");
-    forms.forEach(form => {
-      const input = form.querySelector("input[type='number']");
-      if (input) {
-        input.addEventListener("change", function () {
-          form.submit();  // auto-submit on change
-        });
-      }
-    });
-  });
-</script>
+<script src="{% static 'js/cart.js' %}"></script>
 </body>
 </html>
